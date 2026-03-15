@@ -83,9 +83,6 @@ export default function App() {
             ) : null}
 
             <div onClick={() => setCurrentView('home')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #00d4ff, #00ff87)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(0,212,255,0.5)' }}>
-                <Zap size={18} color="#07090f" strokeWidth={2.5} />
-              </div>
               <span className="font-game" style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '0.1em', background: 'linear-gradient(90deg, #00d4ff, #00ff87)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 ADIXO INCOME
               </span>
