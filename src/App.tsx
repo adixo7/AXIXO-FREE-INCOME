@@ -8,8 +8,17 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [error, setError] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
-  const [withdrawStep, setWithdrawStep] = useState<'select' | 'form'>('select');
+  const [withdrawStep, setWithdrawStep] = useState<'select' | 'form' | 'receipt'>('select');
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [withdrawReceipt, setWithdrawReceipt] = useState<{
+    orderId: string;
+    paymentMethod: string;
+    accountInfo: string;
+    submittedTime: Date;
+    completedTime: Date;
+    amount: string;
+  } | null>(null);
+  const [receiptStatus, setReceiptStatus] = useState<'pending' | 'completed'>('pending');
   const [currentUser, setCurrentUser] = useState<{username: string, email: string} | null>(() => {
     const saved = localStorage.getItem('currentUser');
     return saved ? JSON.parse(saved) : null;
@@ -30,6 +39,14 @@ export default function App() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (withdrawStep === 'receipt') {
+      setReceiptStatus('pending');
+      const timer = setTimeout(() => setReceiptStatus('completed'), 60000);
+      return () => clearTimeout(timer);
+    }
+  }, [withdrawStep]);
 
   const handleMenuClick = (view: ViewState) => {
     if (view === 'withdraw') {
@@ -707,7 +724,7 @@ export default function App() {
               CONTINUE
             </button>
           </>
-        ) : (
+        ) : withdrawStep === 'form' ? (
           <>
             <button
               onClick={() => setWithdrawStep('select')}
@@ -728,10 +745,20 @@ export default function App() {
               style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
               onSubmit={(e) => {
                 e.preventDefault();
-                alert('Withdraw request submitted! We will process it within 24 hours.');
-                setWithdrawStep('select');
-                setSelectedPayment(null);
-                setExpandedGroup(null);
+                const fd = new FormData(e.currentTarget);
+                const accountVal = selected?.fields.map(f => fd.get(f.name) as string).filter(Boolean).join(' / ') || '—';
+                const amount = fd.get('amount') as string;
+                const now = new Date();
+                const completed = new Date(now.getTime() + 60000);
+                setWithdrawReceipt({
+                  orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                  paymentMethod: selected?.label || '—',
+                  accountInfo: accountVal,
+                  submittedTime: now,
+                  completedTime: completed,
+                  amount,
+                });
+                setWithdrawStep('receipt');
               }}
             >
               {selected?.fields.map(f => (
@@ -759,7 +786,74 @@ export default function App() {
               </button>
             </form>
           </>
-        )}
+        ) : withdrawStep === 'receipt' && withdrawReceipt ? (
+          <div className="animate-enter" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{
+              width: '80px', height: '80px', borderRadius: '50%', marginBottom: '20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px',
+              background: receiptStatus === 'completed'
+                ? 'rgba(0,255,135,0.12)' : 'rgba(255,170,0,0.12)',
+              border: receiptStatus === 'completed'
+                ? '2px solid rgba(0,255,135,0.5)' : '2px solid rgba(255,170,0,0.5)',
+              boxShadow: receiptStatus === 'completed'
+                ? '0 0 30px rgba(0,255,135,0.25)' : '0 0 30px rgba(255,170,0,0.2)',
+              transition: 'all 0.6s ease',
+            }}>
+              {receiptStatus === 'completed' ? '✓' : '⏳'}
+            </div>
+
+            <h2 className="font-game" style={{
+              fontSize: '32px', fontWeight: 900, letterSpacing: '0.12em', marginBottom: '6px',
+              color: receiptStatus === 'completed' ? '#00ff87' : '#ffaa00',
+              textShadow: receiptStatus === 'completed'
+                ? '0 0 20px rgba(0,255,135,0.5)' : '0 0 20px rgba(255,170,0,0.4)',
+              transition: 'all 0.6s ease',
+            }}>
+              {receiptStatus === 'completed' ? 'COMPLETED' : 'PENDING'}
+            </h2>
+            <p style={{ fontSize: '13px', color: '#5070a0', marginBottom: '32px', fontWeight: 500 }}>
+              {receiptStatus === 'completed' ? 'Your withdrawal has been processed.' : 'Your request is being reviewed…'}
+            </p>
+
+            <div style={{ width: '100%', background: 'rgba(0,212,255,0.04)', border: '1px solid rgba(0,212,255,0.18)', borderRadius: '14px', overflow: 'hidden' }}>
+              {[
+                { label: 'ORDER ID', value: `#${withdrawReceipt.orderId}` },
+                { label: 'PAYMENT METHOD', value: withdrawReceipt.paymentMethod },
+                { label: 'ACCOUNT / ADDRESS', value: withdrawReceipt.accountInfo },
+                { label: 'ACCOUNT NAME', value: currentUser?.username || '—' },
+                { label: 'SUBMITTED TIME', value: withdrawReceipt.submittedTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }) },
+                { label: 'ORDER COMPLETED TIME', value: withdrawReceipt.completedTime.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }) },
+                { label: 'AMOUNT', value: `$${parseFloat(withdrawReceipt.amount).toFixed(2)}` },
+                { label: 'STATUS', value: receiptStatus === 'completed' ? 'Completed' : 'Pending' },
+              ].map((row, i) => (
+                <div key={i} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '14px 20px', gap: '16px',
+                  borderBottom: i < 7 ? '1px solid rgba(0,212,255,0.08)' : 'none',
+                }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#4a6080', letterSpacing: '0.08em', fontFamily: 'Orbitron, sans-serif', flexShrink: 0 }}>{row.label}</span>
+                  <span style={{
+                    fontSize: '14px', fontWeight: 700, textAlign: 'right',
+                    fontFamily: 'Rajdhani, sans-serif',
+                    color: row.label === 'AMOUNT' ? '#00ff87'
+                      : row.label === 'STATUS'
+                        ? (receiptStatus === 'completed' ? '#00ff87' : '#ffaa00')
+                        : row.label === 'ORDER ID' ? '#00d4ff'
+                        : '#c0d0f0',
+                  }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => { setWithdrawStep('select'); setSelectedPayment(null); setExpandedGroup(null); setWithdrawReceipt(null); }}
+              className="btn-neon"
+              style={{ marginTop: '24px', padding: '12px 40px', borderRadius: '8px', fontSize: '12px', letterSpacing: '0.1em' }}
+            >
+              NEW WITHDRAWAL
+            </button>
+          </div>
+        ) : null}
       </main>
     );
   };
