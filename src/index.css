@@ -187,24 +187,6 @@ body {
   box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
 }
 
-/* Scanning line animation */
-@keyframes scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-.scan-line {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
-  animation: scan 8s linear infinite;
-  pointer-events: none;
-  z-index: 999;
-}
-
 /* Pulsing glow */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 135, 0.3); }

@@ -447,7 +447,6 @@ export default function App() {
   return (
     <div style={{ position: 'relative', minHeight: '100vh' }}>
       <div className="game-bg" />
-      <div className="scan-line" />
       <div style={{ position: 'relative', zIndex: 1 }}>
         {renderHeader()}
         {renderView()}
