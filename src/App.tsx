@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Menu, CircleDollarSign, ArrowLeft, User, History as HistoryIcon, HelpCircle, LogOut, Gamepad2, Zap, Shield, Crosshair, Trophy, Clock, Users } from 'lucide-react';
+import { useState, useRef, useEffect, InputHTMLAttributes } from 'react';
+import { Menu, CircleDollarSign, ArrowLeft, User, History as HistoryIcon, HelpCircle, LogOut, Gamepad2, Zap, Shield, Crosshair, Trophy, Clock, Users, Star, Target, Award, Package, MapPin, Calendar, Heart, Activity, Flame, Sword, Skull } from 'lucide-react';
 
 type ViewState = 'home' | 'login' | 'register' | 'profile' | 'history' | 'support' | 'missions';
 
@@ -161,13 +161,88 @@ export default function App() {
   );
 
   const missions = [
-    { id: 0, title: 'Create New Account', desc: 'Open a new account in Free Fire keeping this app opened in the background.', reward: 3.00, difficulty: 'Newbie', icon: <Users size={18} /> },
-    { id: 1, title: 'Play 3 Ranked Matches', desc: 'Complete 3 BR Ranked matches today.', reward: 0.50, difficulty: 'Easy', icon: <Crosshair size={18} /> },
-    { id: 2, title: '10 Booyahs in CS', desc: 'Win 10 Clash Squad matches.', reward: 2.00, difficulty: 'Medium', icon: <Trophy size={18} /> },
-    { id: 3, title: 'Reach Heroic Tier', desc: 'Reach Heroic tier in BR Ranked.', reward: 5.00, difficulty: 'Hard', icon: <Shield size={18} /> },
-    { id: 4, title: '50 Headshot Kills', desc: 'Get 50 headshots in any mode.', reward: 1.50, difficulty: 'Medium', icon: <Crosshair size={18} /> },
-    { id: 5, title: 'Survive 30 Minutes', desc: 'Total survival time in Battle Royale.', reward: 1.00, difficulty: 'Easy', icon: <Clock size={18} /> },
-    { id: 6, title: 'Play with Friends', desc: 'Play 5 matches with your in-game friends.', reward: 0.75, difficulty: 'Easy', icon: <Users size={18} /> },
+    // ── Newbie (always first) ──
+    { id: 0,  title: 'Create New Account',          desc: 'Open a new Free Fire account with this app running in the background.',          reward: 3.00, difficulty: 'Newbie', icon: <Users size={18} /> },
+    // ── Easy ──
+    { id: 1,  title: 'Play 3 Ranked Matches',       desc: 'Complete 3 BR Ranked matches today.',                                            reward: 0.50, difficulty: 'Easy',   icon: <Crosshair size={18} /> },
+    { id: 2,  title: 'Survive 30 Minutes',          desc: 'Accumulate 30 minutes of survival time in Battle Royale.',                       reward: 1.00, difficulty: 'Easy',   icon: <Clock size={18} /> },
+    { id: 3,  title: 'Play with Friends',           desc: 'Play 5 matches with your in-game friends.',                                      reward: 0.75, difficulty: 'Easy',   icon: <Users size={18} /> },
+    { id: 4,  title: 'Get 5 Kills in One Match',    desc: 'Eliminate 5 enemies in a single Battle Royale match.',                          reward: 0.60, difficulty: 'Easy',   icon: <Crosshair size={18} /> },
+    { id: 5,  title: 'Win a Squad Match',           desc: 'Get a Booyah with your squad in any BR match.',                                  reward: 1.00, difficulty: 'Easy',   icon: <Trophy size={18} /> },
+    { id: 6,  title: 'Open 20 Loot Boxes',         desc: 'Collect and open 20 supply crates across any matches.',                         reward: 0.40, difficulty: 'Easy',   icon: <Package size={18} /> },
+    { id: 7,  title: 'Use a Med Kit 5 Times',       desc: 'Heal yourself using Med Kits 5 times across any matches.',                      reward: 0.35, difficulty: 'Easy',   icon: <Heart size={18} /> },
+    { id: 8,  title: 'Land at Bermuda 5 Times',     desc: 'Start 5 matches on the Bermuda map.',                                           reward: 0.40, difficulty: 'Easy',   icon: <MapPin size={18} /> },
+    { id: 9,  title: 'Drive a Vehicle 5 Times',     desc: 'Hop in and drive any vehicle in 5 separate matches.',                          reward: 0.40, difficulty: 'Easy',   icon: <Activity size={18} /> },
+    { id: 10, title: 'Use Gloo Wall 10 Times',      desc: 'Deploy a Gloo Wall 10 times across any matches.',                              reward: 0.40, difficulty: 'Easy',   icon: <Shield size={18} /> },
+    { id: 11, title: 'Collect 100 Ammo',            desc: 'Pick up a total of 100 ammo across your matches today.',                       reward: 0.30, difficulty: 'Easy',   icon: <Package size={18} /> },
+    { id: 12, title: 'Use an Airdrop Weapon',       desc: 'Pick up and use a weapon from an airdrop crate.',                              reward: 0.60, difficulty: 'Easy',   icon: <Zap size={18} /> },
+    { id: 13, title: 'Knock 20 Enemies',            desc: 'Knock down 20 enemies in any mode.',                                           reward: 0.75, difficulty: 'Easy',   icon: <Crosshair size={18} /> },
+    { id: 14, title: 'Revive 10 Teammates',         desc: 'Revive 10 downed teammates across any squad matches.',                        reward: 0.75, difficulty: 'Easy',   icon: <Heart size={18} /> },
+    { id: 15, title: 'Play 10 Solo Matches',        desc: 'Complete 10 matches in Solo Battle Royale mode.',                              reward: 0.75, difficulty: 'Easy',   icon: <Gamepad2 size={18} /> },
+    { id: 16, title: 'Collect 10 Airdrop Items',    desc: 'Loot 10 items from airdrop crates across any matches.',                       reward: 0.60, difficulty: 'Easy',   icon: <Package size={18} /> },
+    { id: 17, title: 'Get Top 10 in 5 Matches',     desc: 'Finish in the top 10 in 5 separate Battle Royale matches.',                   reward: 0.75, difficulty: 'Easy',   icon: <Award size={18} /> },
+    { id: 18, title: 'Kill with Shotgun 10 Times',  desc: 'Eliminate 10 enemies using any shotgun.',                                      reward: 0.60, difficulty: 'Easy',   icon: <Target size={18} /> },
+    { id: 19, title: 'Kill with AR 20 Times',       desc: 'Eliminate 20 enemies using assault rifles.',                                   reward: 0.75, difficulty: 'Easy',   icon: <Target size={18} /> },
+    { id: 20, title: 'Kill with SMG 15 Times',      desc: 'Eliminate 15 enemies using submachine guns.',                                  reward: 0.65, difficulty: 'Easy',   icon: <Target size={18} /> },
+    { id: 21, title: 'Complete 5 Daily Missions',   desc: 'Finish 5 of your daily in-game missions.',                                    reward: 0.50, difficulty: 'Easy',   icon: <Calendar size={18} /> },
+    { id: 22, title: 'Login 7 Days in a Row',       desc: 'Log in to Free Fire for 7 consecutive days.',                                  reward: 1.50, difficulty: 'Easy',   icon: <Calendar size={18} /> },
+    { id: 23, title: 'Reach Gold Tier',             desc: 'Advance to Gold tier in BR Ranked mode.',                                      reward: 1.00, difficulty: 'Easy',   icon: <Star size={18} /> },
+    { id: 24, title: 'Play 5 Matches in Purgatory', desc: 'Play 5 matches on the Purgatory map.',                                        reward: 0.45, difficulty: 'Easy',   icon: <MapPin size={18} /> },
+    { id: 25, title: 'Play 5 Matches in Kalahari',  desc: 'Play 5 matches on the Kalahari map.',                                         reward: 0.45, difficulty: 'Easy',   icon: <MapPin size={18} /> },
+    { id: 26, title: 'Play 5 Matches in Alpine',    desc: 'Play 5 matches on the Alpine map.',                                           reward: 0.45, difficulty: 'Easy',   icon: <MapPin size={18} /> },
+    { id: 27, title: 'Play 20 Total Matches',       desc: 'Accumulate 20 matches played in any mode.',                                   reward: 0.75, difficulty: 'Easy',   icon: <Gamepad2 size={18} /> },
+    { id: 28, title: 'Use Pets in 10 Matches',      desc: 'Bring a pet companion into 10 different matches.',                            reward: 0.50, difficulty: 'Easy',   icon: <Star size={18} /> },
+    { id: 29, title: 'Use Character Ability 20×',   desc: 'Activate your character\'s active skill 20 times across matches.',            reward: 0.55, difficulty: 'Easy',   icon: <Zap size={18} /> },
+    { id: 30, title: 'Play 10 Matches with Friends', desc: 'Complete 10 matches in a squad with your friend list.',                     reward: 0.80, difficulty: 'Easy',   icon: <Users size={18} /> },
+    { id: 31, title: 'Win a Custom Room Match',     desc: 'Win a match inside a custom room lobby.',                                     reward: 0.75, difficulty: 'Easy',   icon: <Trophy size={18} /> },
+    { id: 32, title: 'Collect 500 Gold Coins',      desc: 'Earn 500 Gold through matches and missions.',                                 reward: 0.50, difficulty: 'Easy',   icon: <CircleDollarSign size={18} /> },
+    { id: 33, title: 'Survive Till Top 5 Once',     desc: 'Make it into the final 5 players in any BR match.',                          reward: 0.70, difficulty: 'Easy',   icon: <Clock size={18} /> },
+    { id: 34, title: 'Complete Monthly Login Bonus', desc: 'Claim the monthly login bonus reward in Free Fire.',                        reward: 1.25, difficulty: 'Easy',   icon: <Calendar size={18} /> },
+    { id: 35, title: 'Play 3 Different Characters', desc: 'Use 3 different characters in separate matches.',                            reward: 0.50, difficulty: 'Easy',   icon: <User size={18} /> },
+    { id: 36, title: 'Survive 1 Hour Total in BR',  desc: 'Accumulate a total of 60 minutes of survival across BR matches.',            reward: 0.75, difficulty: 'Easy',   icon: <Clock size={18} /> },
+    { id: 37, title: 'Reach 50 Matches Played',     desc: 'Play a total of 50 matches in any mode.',                                    reward: 1.00, difficulty: 'Easy',   icon: <Activity size={18} /> },
+    { id: 38, title: 'Complete 10 Daily Missions',  desc: 'Finish 10 daily missions inside Free Fire.',                                 reward: 0.80, difficulty: 'Easy',   icon: <Calendar size={18} /> },
+    // ── Medium ──
+    { id: 39, title: '10 Booyahs in CS',            desc: 'Win 10 Clash Squad matches.',                                                 reward: 2.00, difficulty: 'Medium', icon: <Trophy size={18} /> },
+    { id: 40, title: '50 Headshot Kills',           desc: 'Land 50 headshots across any game mode.',                                    reward: 1.50, difficulty: 'Medium', icon: <Crosshair size={18} /> },
+    { id: 41, title: 'Win a Solo Match',            desc: 'Achieve a Booyah in a solo BR match.',                                       reward: 1.50, difficulty: 'Medium', icon: <Trophy size={18} /> },
+    { id: 42, title: 'Win a Duo Match',             desc: 'Achieve a Booyah in a duo BR match with a partner.',                        reward: 1.25, difficulty: 'Medium', icon: <Trophy size={18} /> },
+    { id: 43, title: 'Get Top 5 in 3 Matches',      desc: 'Finish in the top 5 players in 3 separate BR matches.',                     reward: 1.00, difficulty: 'Medium', icon: <Award size={18} /> },
+    { id: 44, title: 'Win 3 Ranked Matches',        desc: 'Win 3 games in BR Ranked mode.',                                             reward: 1.50, difficulty: 'Medium', icon: <Star size={18} /> },
+    { id: 45, title: 'Reach Platinum Tier',         desc: 'Advance to Platinum tier in BR Ranked.',                                     reward: 1.75, difficulty: 'Medium', icon: <Star size={18} /> },
+    { id: 46, title: 'Kill 5 Enemies with Grenades', desc: 'Eliminate 5 enemies using grenades of any type.',                         reward: 1.00, difficulty: 'Medium', icon: <Flame size={18} /> },
+    { id: 47, title: 'Win 5 Clash Squad Matches',   desc: 'Win 5 matches in Clash Squad mode.',                                        reward: 1.75, difficulty: 'Medium', icon: <Shield size={18} /> },
+    { id: 48, title: 'Get MVP in 5 Matches',        desc: 'Earn the MVP title in 5 Clash Squad matches.',                              reward: 1.50, difficulty: 'Medium', icon: <Award size={18} /> },
+    { id: 49, title: 'Deal 5000 Damage Total',      desc: 'Deal a cumulative 5000 damage across any matches.',                         reward: 1.25, difficulty: 'Medium', icon: <Activity size={18} /> },
+    { id: 50, title: 'Kill Enemy in Moving Vehicle', desc: 'Eliminate an enemy while they are inside a moving vehicle.',               reward: 1.00, difficulty: 'Medium', icon: <Target size={18} /> },
+    { id: 51, title: 'Survive Till Top 3 in 5 Matches', desc: 'Make it to the final 3 in 5 different BR matches.',                    reward: 1.25, difficulty: 'Medium', icon: <Clock size={18} /> },
+    { id: 52, title: 'Kill 3 Enemies with Knife',   desc: 'Get 3 eliminations using the melee knife.',                                 reward: 1.00, difficulty: 'Medium', icon: <Crosshair size={18} /> },
+    { id: 53, title: 'Get Kills on 10 Maps',        desc: 'Get at least one kill on 10 different maps.',                               reward: 1.25, difficulty: 'Medium', icon: <MapPin size={18} /> },
+    { id: 54, title: 'Play 30 Matches in a Week',   desc: 'Complete 30 total matches within 7 days.',                                  reward: 2.00, difficulty: 'Medium', icon: <Calendar size={18} /> },
+    { id: 55, title: 'Kill with Pan 5 Times',       desc: 'Eliminate 5 enemies using the frying pan.',                                reward: 1.25, difficulty: 'Medium', icon: <Flame size={18} /> },
+    { id: 56, title: 'Get 100 Total Kills',         desc: 'Reach a cumulative total of 100 kills across all matches.',                 reward: 2.00, difficulty: 'Medium', icon: <Skull size={18} /> },
+    { id: 57, title: 'Finish with Highest Damage',  desc: 'Deal the most damage in a single match.',                                   reward: 1.50, difficulty: 'Medium', icon: <Activity size={18} /> },
+    { id: 58, title: 'Get 5 Kills in CS Match',     desc: 'Eliminate 5 enemies in a single Clash Squad match.',                       reward: 1.75, difficulty: 'Medium', icon: <Crosshair size={18} /> },
+    { id: 59, title: 'Win a CS Ranked Match',       desc: 'Win a game in Clash Squad Ranked mode.',                                    reward: 1.50, difficulty: 'Medium', icon: <Shield size={18} /> },
+    { id: 60, title: 'Complete 20 Weekly Missions', desc: 'Complete 20 weekly missions inside Free Fire.',                            reward: 2.50, difficulty: 'Medium', icon: <Calendar size={18} /> },
+    { id: 61, title: 'Kill in Air (Parachute)',     desc: 'Eliminate an enemy while they are still parachuting down.',                reward: 1.25, difficulty: 'Medium', icon: <Target size={18} /> },
+    { id: 62, title: 'Get 3 Kills in Final Zone',   desc: 'Eliminate 3 players while inside the final safe zone.',                    reward: 1.00, difficulty: 'Medium', icon: <Flame size={18} /> },
+    { id: 63, title: 'Reach 100 Matches Played',    desc: 'Play a total of 100 matches across all modes.',                             reward: 2.00, difficulty: 'Medium', icon: <Activity size={18} /> },
+    { id: 64, title: '20 Kills with Sniper',        desc: 'Accumulate 20 kills using any sniper rifle.',                               reward: 1.50, difficulty: 'Medium', icon: <Target size={18} /> },
+    { id: 65, title: 'Win 2 Duo Ranked Matches',    desc: 'Win 2 games in Duo BR Ranked mode.',                                        reward: 1.75, difficulty: 'Medium', icon: <Trophy size={18} /> },
+    { id: 66, title: 'Equip Full Accessories Set',  desc: 'Equip a full set of accessories (head, face, body, bag).',                  reward: 0.45, difficulty: 'Medium', icon: <User size={18} /> },
+    { id: 67, title: 'Deal 10000 Total Damage',     desc: 'Deal a cumulative total of 10,000 damage across all matches.',              reward: 2.50, difficulty: 'Medium', icon: <Activity size={18} /> },
+    // ── Hard ──
+    { id: 68, title: 'Reach Heroic Tier',           desc: 'Reach Heroic tier in BR Ranked mode.',                                      reward: 5.00, difficulty: 'Hard',   icon: <Shield size={18} /> },
+    { id: 69, title: 'Reach Diamond Tier',          desc: 'Advance to Diamond tier in BR Ranked.',                                     reward: 3.00, difficulty: 'Hard',   icon: <Star size={18} /> },
+    { id: 70, title: 'Reach Master Tier',           desc: 'Achieve Master tier in BR Ranked — the elite bracket.',                    reward: 4.50, difficulty: 'Hard',   icon: <Trophy size={18} /> },
+    { id: 71, title: 'Booyah in Solo vs Squad',     desc: 'Win a Solo vs Squad match by yourself.',                                    reward: 4.00, difficulty: 'Hard',   icon: <Skull size={18} /> },
+    { id: 72, title: 'Win Without Using Meds',      desc: 'Win a BR match without healing once.',                                      reward: 3.50, difficulty: 'Hard',   icon: <Heart size={18} /> },
+    { id: 73, title: '10 Kills in Single Match',    desc: 'Eliminate 10 enemies in a single Battle Royale match.',                    reward: 4.00, difficulty: 'Hard',   icon: <Crosshair size={18} /> },
+    { id: 74, title: 'Win with Full Squad Alive',   desc: 'Win a squad match with all 4 members surviving to the end.',               reward: 3.00, difficulty: 'Hard',   icon: <Users size={18} /> },
+    { id: 75, title: 'Get an Ace in CS',            desc: 'Eliminate the entire enemy team solo in a CS round.',                      reward: 3.50, difficulty: 'Hard',   icon: <Award size={18} /> },
+    { id: 76, title: 'Reach CS Platinum',           desc: 'Reach Platinum rank in Clash Squad Ranked mode.',                          reward: 3.00, difficulty: 'Hard',   icon: <Shield size={18} /> },
+    { id: 77, title: 'Get 200 Total Kills',         desc: 'Accumulate 200 total kills across all game modes.',                        reward: 3.50, difficulty: 'Hard',   icon: <Skull size={18} /> },
   ];
 
   const difficultyStyle: Record<string, string> = {
@@ -223,7 +298,7 @@ export default function App() {
     </main>
   );
 
-  const formInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+  const formInput = (props: InputHTMLAttributes<HTMLInputElement>) => (
     <input {...props} className="game-input" style={{ padding: '12px 16px', borderRadius: '8px', ...props.style }} />
   );
 
