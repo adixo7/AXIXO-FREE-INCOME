@@ -87,7 +87,7 @@ export default function App() {
                 <Zap size={18} color="#07090f" strokeWidth={2.5} />
               </div>
               <span className="font-game" style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '0.1em', background: 'linear-gradient(90deg, #00d4ff, #00ff87)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                ADIXO
+                ADIXO INCOME
               </span>
             </div>
           </div>
@@ -407,7 +407,7 @@ export default function App() {
         const formData = new FormData(e.currentTarget);
         const subject = formData.get('subject');
         const message = formData.get('message');
-        const text = `🆘 *New Support Request* 🆘\n\n📌 *Subject:*\n${subject}\n\n📝 *Message:*\n${message}\n\n------------------------\n🤖 _Sent from ADIXO FREE INCOME App_`;
+        const text = `🆘 *New Support Request* 🆘\n\n📌 *Subject:*\n${subject}\n\n📝 *Message:*\n${message}\n\n------------------------\n🤖 _Sent from ADIXO INCOME App_`;
         window.open(`https://t.me/AdiXO_TV?text=${encodeURIComponent(text)}`, '_blank');
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
