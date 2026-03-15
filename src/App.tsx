@@ -816,6 +816,15 @@ export default function App() {
                 const now = new Date();
                 const randomDelay = (50 + Math.floor(Math.random() * 11)) * 1000;
                 const completed = new Date(now.getTime() + randomDelay);
+                const users = JSON.parse(localStorage.getItem('adixo_users') || '{}');
+                if (currentUser && users[currentUser.email]) {
+                  users[currentUser.email].balance = Math.max(0, (users[currentUser.email].balance || 0) - parseFloat(amount));
+                  users[currentUser.email].history = [
+                    { title: `Withdrawal via ${selected?.label || 'Unknown'}`, date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }), amount: `-$${parseFloat(amount).toFixed(2)}` },
+                    ...(users[currentUser.email].history || []),
+                  ];
+                  localStorage.setItem('adixo_users', JSON.stringify(users));
+                }
                 setWithdrawReceipt({
                   orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
                   paymentMethod: selected?.label || '—',
