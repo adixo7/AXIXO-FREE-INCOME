@@ -519,9 +519,7 @@ export default function App() {
       label: 'PayPal',
       sub: 'US Dollar',
       logo: (
-        <span style={{ fontFamily: 'Arial, sans-serif', fontWeight: 900, fontSize: '16px' }}>
-          <span style={{ color: '#003087' }}>Pay</span><span style={{ color: '#009cde' }}>Pal</span>
-        </span>
+        <img src="/paypal.png" alt="PayPal" style={{ height: '32px', objectFit: 'contain' }} />
       ),
       fields: [{ name: 'email', label: 'PAYPAL EMAIL', type: 'email', placeholder: 'your@paypal.com' }],
     },
@@ -569,7 +567,7 @@ export default function App() {
       label: 'bKash',
       sub: 'BDT',
       logo: (
-        <span style={{ background: '#e2136e', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>bKash</span>
+        <img src="/bkash.png" alt="bKash" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />
       ),
       fields: [{ name: 'phone', label: 'BKASH NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
     },
@@ -578,7 +576,7 @@ export default function App() {
       label: 'Nagad',
       sub: 'BDT',
       logo: (
-        <span style={{ background: 'linear-gradient(135deg, #f05a28, #f7941d)', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>Nagad</span>
+        <img src="/nagad.png" alt="Nagad" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />
       ),
       fields: [{ name: 'phone', label: 'NAGAD NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
     },
