@@ -744,14 +744,14 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <label style={{ fontSize: '11px', fontWeight: 700, color: '#4a6080', letterSpacing: '0.08em', fontFamily: 'Orbitron, sans-serif' }}>AMOUNT (USD)</label>
                 <input
-                  name="amount" type="number" placeholder={`Min $1.00 — Max $${balance.toFixed(2)}`}
-                  min="1" max={balance} step="0.01" required
+                  name="amount" type="number" placeholder={`Min $5.00 — Max $150.00`}
+                  min="5" max={Math.min(balance, 150)} step="0.01" required
                   className="game-input" style={{ padding: '12px 16px', borderRadius: '8px' }}
                 />
               </div>
 
               <div style={{ background: 'rgba(255,170,0,0.06)', border: '1px solid rgba(255,170,0,0.2)', borderRadius: '8px', padding: '12px 16px', fontSize: '12px', color: '#ffaa00', fontWeight: 500 }}>
-                ⚠ Withdrawals are reviewed within 24 hours. Minimum withdrawal is $1.00.
+                ⚠ Withdrawals are reviewed within 24 hours. Minimum $5.00 — Maximum $150.00.
               </div>
 
               <button type="submit" className="btn-neon btn-green" style={{ padding: '14px', borderRadius: '8px', fontSize: '13px', letterSpacing: '0.1em', marginTop: '4px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
