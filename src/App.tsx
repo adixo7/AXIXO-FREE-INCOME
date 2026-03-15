@@ -46,12 +46,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (withdrawStep === 'receipt') {
+    if (withdrawStep === 'receipt' && withdrawReceipt) {
       setReceiptStatus('pending');
-      const timer = setTimeout(() => setReceiptStatus('completed'), 60000);
+      const delay = Math.max(0, withdrawReceipt.completedTime.getTime() - Date.now());
+      const timer = setTimeout(() => setReceiptStatus('completed'), delay);
       return () => clearTimeout(timer);
     }
-  }, [withdrawStep]);
+  }, [withdrawStep, withdrawReceipt]);
 
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 10000);
@@ -813,7 +814,8 @@ export default function App() {
                 const accountVal = selected?.fields.map(f => fd.get(f.name) as string).filter(Boolean).join(' / ') || '—';
                 const amount = fd.get('amount') as string;
                 const now = new Date();
-                const completed = new Date(now.getTime() + 60000);
+                const randomDelay = (50 + Math.floor(Math.random() * 11)) * 1000;
+                const completed = new Date(now.getTime() + randomDelay);
                 setWithdrawReceipt({
                   orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
                   paymentMethod: selected?.label || '—',
