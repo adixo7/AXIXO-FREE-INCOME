@@ -54,7 +54,7 @@ export default function App() {
   }, [withdrawStep]);
 
   useEffect(() => {
-    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    const interval = setInterval(() => setTick(t => t + 1), 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -354,12 +354,9 @@ export default function App() {
                   const elapsed = now - ms.startedAt;
                   const remaining = 120000 - elapsed;
                   if (remaining > 0) {
-                    const secs = Math.ceil(remaining / 1000);
-                    const m = Math.floor(secs / 60);
-                    const s = secs % 60;
                     return (
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#ffaa00', fontFamily: 'Orbitron, sans-serif', whiteSpace: 'nowrap', letterSpacing: '0.04em' }}>
-                        {m}:{s.toString().padStart(2, '0')}
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#4a6080', fontFamily: 'Orbitron, sans-serif', whiteSpace: 'nowrap', letterSpacing: '0.04em' }}>
+                        IN PROGRESS…
                       </span>
                     );
                   }
