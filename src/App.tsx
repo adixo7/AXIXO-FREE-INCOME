@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect, InputHTMLAttributes } from 'react';
-import { Menu, CircleDollarSign, ArrowLeft, User, History as HistoryIcon, HelpCircle, LogOut, Gamepad2, Zap, Shield, Crosshair, Trophy, Clock, Users, Star, Target, Award, Package, MapPin, Calendar, Heart, Activity, Flame, Sword, Skull } from 'lucide-react';
+import { Menu, CircleDollarSign, ArrowLeft, User, History as HistoryIcon, HelpCircle, LogOut, Gamepad2, Zap, Shield, Crosshair, Trophy, Clock, Users, Star, Target, Award, Package, MapPin, Calendar, Heart, Activity, Flame, Sword, Skull, Wallet } from 'lucide-react';
 
-type ViewState = 'home' | 'login' | 'register' | 'profile' | 'history' | 'support' | 'missions';
+type ViewState = 'home' | 'login' | 'register' | 'profile' | 'history' | 'support' | 'missions' | 'withdraw';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [error, setError] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+  const [withdrawStep, setWithdrawStep] = useState<'select' | 'form'>('select');
   const [currentUser, setCurrentUser] = useState<{username: string, email: string} | null>(() => {
     const saved = localStorage.getItem('currentUser');
     return saved ? JSON.parse(saved) : null;
@@ -29,6 +31,10 @@ export default function App() {
   }, []);
 
   const handleMenuClick = (view: ViewState) => {
+    if (view === 'withdraw') {
+      setSelectedPayment(null);
+      setWithdrawStep('select');
+    }
     setCurrentView(view);
     setIsMenuOpen(false);
   };
@@ -59,6 +65,7 @@ export default function App() {
                       { icon: <User size={15} />, label: 'Profile & Security', view: 'profile' as ViewState },
                       { icon: <Gamepad2 size={15} />, label: 'Free Fire Missions', view: 'missions' as ViewState },
                       { icon: <HistoryIcon size={15} />, label: 'Earning History', view: 'history' as ViewState },
+                      { icon: <Wallet size={15} />, label: 'Withdraw', view: 'withdraw' as ViewState },
                       { icon: <HelpCircle size={15} />, label: 'Support', view: 'support' as ViewState },
                     ].map(item => (
                       <button key={item.view} onClick={() => handleMenuClick(item.view)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', background: 'transparent', border: 'none', color: '#c0d0f0', cursor: 'pointer', fontSize: '14px', fontFamily: 'Rajdhani, sans-serif', fontWeight: 600, letterSpacing: '0.03em', transition: 'all 0.2s', textAlign: 'left' }}
@@ -506,6 +513,216 @@ export default function App() {
     </main>
   );
 
+  const paymentMethods = [
+    {
+      id: 'paypal',
+      label: 'PayPal',
+      sub: 'US Dollar',
+      logo: (
+        <span style={{ fontFamily: 'Arial, sans-serif', fontWeight: 900, fontSize: '16px' }}>
+          <span style={{ color: '#003087' }}>Pay</span><span style={{ color: '#009cde' }}>Pal</span>
+        </span>
+      ),
+      fields: [{ name: 'email', label: 'PAYPAL EMAIL', type: 'email', placeholder: 'your@paypal.com' }],
+    },
+    {
+      id: 'crypto',
+      label: 'Cryptocurrency',
+      sub: 'USD',
+      logo: (
+        <span style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <span style={{ background: '#f7931a', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 900, color: '#fff' }}>₿</span>
+          <span style={{ background: '#627eea', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 900, color: '#fff' }}>Ξ</span>
+          <span style={{ background: '#26a17b', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 900, color: '#fff' }}>₮</span>
+        </span>
+      ),
+      fields: [
+        { name: 'network', label: 'NETWORK', type: 'text', placeholder: 'e.g. BTC, ETH, USDT' },
+        { name: 'address', label: 'WALLET ADDRESS', type: 'text', placeholder: 'Enter wallet address' },
+      ],
+    },
+    {
+      id: 'applepay',
+      label: 'Apple Pay',
+      sub: 'USD',
+      logo: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#fff', fontWeight: 700, fontSize: '15px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+          <span style={{ fontSize: '18px' }}></span> Pay
+        </span>
+      ),
+      fields: [{ name: 'phone', label: 'APPLE ID / PHONE', type: 'text', placeholder: 'Linked Apple ID' }],
+    },
+    {
+      id: 'googlepay',
+      label: 'Google Pay',
+      sub: 'USD',
+      logo: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '15px', fontFamily: 'Arial, sans-serif' }}>
+          <span style={{ color: '#4285f4' }}>G</span><span style={{ color: '#ea4335' }}>o</span><span style={{ color: '#fbbc05' }}>o</span><span style={{ color: '#4285f4' }}>g</span><span style={{ color: '#34a853' }}>l</span><span style={{ color: '#ea4335' }}>e</span>
+          <span style={{ color: '#e0e8ff', marginLeft: '2px' }}>Pay</span>
+        </span>
+      ),
+      fields: [{ name: 'phone', label: 'PHONE / GMAIL', type: 'text', placeholder: 'Linked Google account' }],
+    },
+    {
+      id: 'bkash',
+      label: 'bKash',
+      sub: 'BDT',
+      logo: (
+        <span style={{ background: '#e2136e', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>bKash</span>
+      ),
+      fields: [{ name: 'phone', label: 'BKASH NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
+    },
+    {
+      id: 'nagad',
+      label: 'Nagad',
+      sub: 'BDT',
+      logo: (
+        <span style={{ background: 'linear-gradient(135deg, #f05a28, #f7941d)', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>Nagad</span>
+      ),
+      fields: [{ name: 'phone', label: 'NAGAD NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
+    },
+    {
+      id: 'upi',
+      label: 'UPI',
+      sub: 'INR',
+      logo: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ background: 'linear-gradient(135deg, #097939, #00b050)', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>UPI</span>
+        </span>
+      ),
+      fields: [{ name: 'upi', label: 'UPI ID', type: 'text', placeholder: 'yourname@upi' }],
+    },
+  ];
+
+  const renderWithdraw = () => {
+    const selected = paymentMethods.find(p => p.id === selectedPayment);
+
+    return (
+      <main className="animate-enter" style={{ maxWidth: '700px', margin: '0 auto', padding: '32px 24px 80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div className="section-bar">
+            <h2 className="font-game" style={{ fontSize: '22px', fontWeight: 900, letterSpacing: '0.08em', color: '#e0e8ff', margin: 0 }}>WITHDRAW FUNDS</h2>
+          </div>
+          <div className="pulse-green" style={{ background: 'rgba(0,255,135,0.08)', border: '1px solid rgba(0,255,135,0.25)', borderRadius: '8px', padding: '8px 16px' }}>
+            <span className="font-game neon-green" style={{ fontSize: '15px', fontWeight: 900 }}>BAL: ${balance.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {withdrawStep === 'select' ? (
+          <>
+            <p style={{ fontSize: '13px', color: '#5070a0', marginBottom: '20px', fontWeight: 500 }}>Select your preferred payment method to withdraw your earnings.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+              {paymentMethods.map(method => (
+                <button
+                  key={method.id}
+                  onClick={() => setSelectedPayment(method.id)}
+                  style={{
+                    background: selectedPayment === method.id
+                      ? 'rgba(0,212,255,0.1)'
+                      : 'rgba(0,212,255,0.03)',
+                    border: selectedPayment === method.id
+                      ? '1px solid rgba(0,212,255,0.6)'
+                      : '1px solid rgba(0,212,255,0.15)',
+                    borderRadius: '12px',
+                    padding: '18px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: selectedPayment === method.id ? '0 0 16px rgba(0,212,255,0.2)' : 'none',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '20px', height: '20px', borderRadius: '50%',
+                      border: selectedPayment === method.id ? '2px solid #00d4ff' : '2px solid rgba(0,212,255,0.3)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    }}>
+                      {selectedPayment === method.id && (
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00d4ff' }} />
+                      )}
+                    </div>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif' }}>{method.label}</div>
+                      <div style={{ fontSize: '11px', color: '#4a6080', fontWeight: 500 }}>({method.sub})</div>
+                    </div>
+                  </div>
+                  <div>{method.logo}</div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => { if (selectedPayment) setWithdrawStep('form'); }}
+              className="btn-neon"
+              style={{
+                marginTop: '28px', padding: '14px', borderRadius: '8px', fontSize: '13px',
+                letterSpacing: '0.1em', width: '100%',
+                opacity: selectedPayment ? 1 : 0.4,
+                cursor: selectedPayment ? 'pointer' : 'not-allowed',
+              }}
+            >
+              CONTINUE
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setWithdrawStep('select')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: '#00d4ff', cursor: 'pointer', fontSize: '13px', fontWeight: 600, marginBottom: '24px', padding: 0, fontFamily: 'Rajdhani, sans-serif' }}
+            >
+              <ArrowLeft size={16} /> Back to payment methods
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px' }}>
+              <div>{selected?.logo}</div>
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif' }}>{selected?.label}</div>
+                <div style={{ fontSize: '12px', color: '#4a6080' }}>Selected payment method</div>
+              </div>
+            </div>
+
+            <form
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert('Withdraw request submitted! We will process it within 24 hours.');
+                setWithdrawStep('select');
+                setSelectedPayment(null);
+              }}
+            >
+              {selected?.fields.map(f => (
+                <div key={f.name} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4a6080', letterSpacing: '0.08em', fontFamily: 'Orbitron, sans-serif' }}>{f.label}</label>
+                  <input name={f.name} type={f.type} placeholder={f.placeholder} required className="game-input" style={{ padding: '12px 16px', borderRadius: '8px' }} />
+                </div>
+              ))}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: '#4a6080', letterSpacing: '0.08em', fontFamily: 'Orbitron, sans-serif' }}>AMOUNT (USD)</label>
+                <input
+                  name="amount" type="number" placeholder={`Min $1.00 — Max $${balance.toFixed(2)}`}
+                  min="1" max={balance} step="0.01" required
+                  className="game-input" style={{ padding: '12px 16px', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div style={{ background: 'rgba(255,170,0,0.06)', border: '1px solid rgba(255,170,0,0.2)', borderRadius: '8px', padding: '12px 16px', fontSize: '12px', color: '#ffaa00', fontWeight: 500 }}>
+                ⚠ Withdrawals are reviewed within 24 hours. Minimum withdrawal is $1.00.
+              </div>
+
+              <button type="submit" className="btn-neon btn-green" style={{ padding: '14px', borderRadius: '8px', fontSize: '13px', letterSpacing: '0.1em', marginTop: '4px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Wallet size={16} /> SUBMIT WITHDRAWAL
+              </button>
+            </form>
+          </>
+        )}
+      </main>
+    );
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'home': return renderHome();
@@ -515,6 +732,7 @@ export default function App() {
       case 'history': return renderHistory();
       case 'support': return renderSupport();
       case 'missions': return renderMissions();
+      case 'withdraw': return renderWithdraw();
     }
   };
 
