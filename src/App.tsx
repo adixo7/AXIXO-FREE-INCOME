@@ -578,8 +578,8 @@ export default function App() {
   const displaySections: DisplaySection[] = [
     { type: 'standalone', methodId: 'crypto' },
     { type: 'standalone', methodId: 'applepay' },
-    { type: 'group', id: 'bangladesh', label: 'Bangladesh Banking', flag: '🇧🇩', methodIds: ['bkash', 'nagad'] },
-    { type: 'group', id: 'indian', label: 'Indian Banking', flag: '🇮🇳', methodIds: ['paypal', 'googlepay', 'upi'] },
+    { type: 'group', id: 'bangladesh', label: 'Bangladesh Banking', flag: '', methodIds: ['bkash', 'nagad'] },
+    { type: 'group', id: 'indian', label: 'Indian Banking', flag: '', methodIds: ['paypal', 'googlepay', 'upi'] },
   ];
 
   const renderMethodCard = (methodId: string, compact = false) => {
@@ -666,7 +666,6 @@ export default function App() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontSize: '20px' }}>{section.flag}</span>
                         <div style={{ textAlign: 'left' }}>
                           <div className="font-game" style={{ fontSize: '14px', fontWeight: 700, color: '#e0e8ff', letterSpacing: '0.05em' }}>{section.label}</div>
                           <div style={{ fontSize: '11px', color: '#4a6080', fontWeight: 500 }}>
