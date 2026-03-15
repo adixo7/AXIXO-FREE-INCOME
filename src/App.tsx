@@ -266,31 +266,33 @@ export default function App() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {missions.map((mission, idx) => (
-          <div key={mission.id} className="game-card" style={{ borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', animationDelay: `${idx * 0.05}s` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: 0 }}>
-              <div style={{ width: '42px', height: '42px', background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00d4ff', flexShrink: 0 }}>
-                {mission.icon}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '15px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif', letterSpacing: '0.03em' }}>{mission.title}</span>
-                  <span className={difficultyStyle[mission.difficulty]} style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.06em', fontFamily: 'Orbitron, sans-serif' }}>{mission.difficulty.toUpperCase()}</span>
+          <div key={mission.id} className="game-card" style={{ borderRadius: '12px', padding: '20px', animationDelay: `${idx * 0.05}s` }}>
+            <div className="mission-card-row">
+              <div className="mission-card-info">
+                <div style={{ width: '42px', height: '42px', background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00d4ff', flexShrink: 0 }}>
+                  {mission.icon}
                 </div>
-                <p style={{ fontSize: '13px', color: '#5070a0', margin: 0, fontWeight: 500 }}>{mission.desc}</p>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif', letterSpacing: '0.03em' }}>{mission.title}</span>
+                    <span className={difficultyStyle[mission.difficulty]} style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.06em', fontFamily: 'Orbitron, sans-serif' }}>{mission.difficulty.toUpperCase()}</span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#5070a0', margin: 0, fontWeight: 500 }}>{mission.desc}</p>
+                </div>
               </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-              <div className="font-game neon-green" style={{ fontSize: '20px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <CircleDollarSign size={18} color="#00ff87" />
-                {mission.reward.toFixed(2)}
+              <div className="mission-card-actions">
+                <div className="font-game neon-green" style={{ fontSize: '20px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <CircleDollarSign size={18} color="#00ff87" />
+                  {mission.reward.toFixed(2)}
+                </div>
+                <button
+                  onClick={() => { if (!currentUser) setCurrentView('login'); else alert('Mission started! Complete it in-game and return here to claim.'); }}
+                  className="btn-neon"
+                  style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
+                >
+                  START
+                </button>
               </div>
-              <button
-                onClick={() => { if (!currentUser) setCurrentView('login'); else alert('Mission started! Complete it in-game and return here to claim.'); }}
-                className="btn-neon"
-                style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
-              >
-                START
-              </button>
             </div>
           </div>
         ))}
