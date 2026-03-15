@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, InputHTMLAttributes } from 'react';
+import { useState, useRef, useEffect, InputHTMLAttributes, ReactNode } from 'react';
 import { Menu, CircleDollarSign, ArrowLeft, User, History as HistoryIcon, HelpCircle, LogOut, Gamepad2, Zap, Shield, Crosshair, Trophy, Clock, Users, Star, Target, Award, Package, MapPin, Calendar, Heart, Activity, Flame, Sword, Skull, Wallet } from 'lucide-react';
 
 type ViewState = 'home' | 'login' | 'register' | 'profile' | 'history' | 'support' | 'missions' | 'withdraw';
@@ -9,6 +9,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [withdrawStep, setWithdrawStep] = useState<'select' | 'form'>('select');
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{username: string, email: string} | null>(() => {
     const saved = localStorage.getItem('currentUser');
     return saved ? JSON.parse(saved) : null;
@@ -34,6 +35,7 @@ export default function App() {
     if (view === 'withdraw') {
       setSelectedPayment(null);
       setWithdrawStep('select');
+      setExpandedGroup(null);
     }
     setCurrentView(view);
     setIsMenuOpen(false);
@@ -513,20 +515,9 @@ export default function App() {
     </main>
   );
 
-  const paymentMethods = [
-    {
-      id: 'paypal',
-      label: 'PayPal',
-      sub: 'US Dollar',
-      logo: (
-        <img src="/paypal.png" alt="PayPal" style={{ height: '32px', objectFit: 'contain' }} />
-      ),
-      fields: [{ name: 'email', label: 'PAYPAL EMAIL', type: 'email', placeholder: 'your@paypal.com' }],
-    },
-    {
-      id: 'crypto',
-      label: 'Cryptocurrency',
-      sub: 'USD',
+  const allPaymentMethods: Record<string, { id: string; label: string; sub: string; logo: ReactNode; fields: { name: string; label: string; type: string; placeholder: string }[] }> = {
+    crypto: {
+      id: 'crypto', label: 'Cryptocurrency', sub: 'USD',
       logo: (
         <span style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <span style={{ background: '#f7931a', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 900, color: '#fff' }}>₿</span>
@@ -539,10 +530,8 @@ export default function App() {
         { name: 'address', label: 'WALLET ADDRESS', type: 'text', placeholder: 'Enter wallet address' },
       ],
     },
-    {
-      id: 'applepay',
-      label: 'Apple Pay',
-      sub: 'USD',
+    applepay: {
+      id: 'applepay', label: 'Apple Pay', sub: 'USD',
       logo: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#fff', fontWeight: 700, fontSize: '15px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
           <span style={{ fontSize: '18px' }}></span> Pay
@@ -550,10 +539,23 @@ export default function App() {
       ),
       fields: [{ name: 'phone', label: 'APPLE ID / PHONE', type: 'text', placeholder: 'Linked Apple ID' }],
     },
-    {
-      id: 'googlepay',
-      label: 'Google Pay',
-      sub: 'USD',
+    bkash: {
+      id: 'bkash', label: 'bKash', sub: 'BDT',
+      logo: <img src="/bkash.png" alt="bKash" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />,
+      fields: [{ name: 'phone', label: 'BKASH NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
+    },
+    nagad: {
+      id: 'nagad', label: 'Nagad', sub: 'BDT',
+      logo: <img src="/nagad.png" alt="Nagad" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />,
+      fields: [{ name: 'phone', label: 'NAGAD NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
+    },
+    paypal: {
+      id: 'paypal', label: 'PayPal', sub: 'USD',
+      logo: <img src="/paypal.png" alt="PayPal" style={{ height: '32px', objectFit: 'contain' }} />,
+      fields: [{ name: 'email', label: 'PAYPAL EMAIL', type: 'email', placeholder: 'your@paypal.com' }],
+    },
+    googlepay: {
+      id: 'googlepay', label: 'Google Pay', sub: 'USD',
       logo: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '15px', fontFamily: 'Arial, sans-serif' }}>
           <span style={{ color: '#4285f4' }}>G</span><span style={{ color: '#ea4335' }}>o</span><span style={{ color: '#fbbc05' }}>o</span><span style={{ color: '#4285f4' }}>g</span><span style={{ color: '#34a853' }}>l</span><span style={{ color: '#ea4335' }}>e</span>
@@ -562,37 +564,61 @@ export default function App() {
       ),
       fields: [{ name: 'phone', label: 'PHONE / GMAIL', type: 'text', placeholder: 'Linked Google account' }],
     },
-    {
-      id: 'bkash',
-      label: 'bKash',
-      sub: 'BDT',
-      logo: (
-        <img src="/bkash.png" alt="bKash" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />
-      ),
-      fields: [{ name: 'phone', label: 'BKASH NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
-    },
-    {
-      id: 'nagad',
-      label: 'Nagad',
-      sub: 'BDT',
-      logo: (
-        <img src="/nagad.png" alt="Nagad" style={{ height: '36px', objectFit: 'contain', borderRadius: '8px' }} />
-      ),
-      fields: [{ name: 'phone', label: 'NAGAD NUMBER', type: 'tel', placeholder: '01XXXXXXXXX' }],
-    },
-    {
-      id: 'upi',
-      label: 'UPI',
-      sub: 'INR',
-      logo: (
-        <img src="/upi.avif" alt="UPI" style={{ height: '32px', objectFit: 'contain' }} />
-      ),
+    upi: {
+      id: 'upi', label: 'UPI', sub: 'INR',
+      logo: <img src="/upi.avif" alt="UPI" style={{ height: '32px', objectFit: 'contain' }} />,
       fields: [{ name: 'upi', label: 'UPI ID', type: 'text', placeholder: 'yourname@upi' }],
     },
+  };
+
+  type DisplaySection =
+    | { type: 'standalone'; methodId: string }
+    | { type: 'group'; id: string; label: string; flag: string; methodIds: string[] };
+
+  const displaySections: DisplaySection[] = [
+    { type: 'standalone', methodId: 'crypto' },
+    { type: 'standalone', methodId: 'applepay' },
+    { type: 'group', id: 'bangladesh', label: 'Bangladesh Banking', flag: '🇧🇩', methodIds: ['bkash', 'nagad'] },
+    { type: 'group', id: 'indian', label: 'Indian Banking', flag: '🇮🇳', methodIds: ['paypal', 'googlepay', 'upi'] },
   ];
 
+  const renderMethodCard = (methodId: string, compact = false) => {
+    const method = allPaymentMethods[methodId];
+    const isSelected = selectedPayment === methodId;
+    return (
+      <button
+        key={methodId}
+        onClick={() => setSelectedPayment(methodId)}
+        style={{
+          background: isSelected ? 'rgba(0,212,255,0.1)' : 'rgba(0,212,255,0.03)',
+          border: isSelected ? '1px solid rgba(0,212,255,0.6)' : '1px solid rgba(0,212,255,0.15)',
+          borderRadius: '10px',
+          padding: compact ? '14px 16px' : '18px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          cursor: 'pointer', transition: 'all 0.2s', width: '100%',
+          boxShadow: isSelected ? '0 0 14px rgba(0,212,255,0.18)' : 'none',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '18px', height: '18px', borderRadius: '50%', flexShrink: 0,
+            border: isSelected ? '2px solid #00d4ff' : '2px solid rgba(0,212,255,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {isSelected && <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#00d4ff' }} />}
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif' }}>{method.label}</div>
+            <div style={{ fontSize: '11px', color: '#4a6080', fontWeight: 500 }}>({method.sub})</div>
+          </div>
+        </div>
+        <div>{method.logo}</div>
+      </button>
+    );
+  };
+
   const renderWithdraw = () => {
-    const selected = paymentMethods.find(p => p.id === selectedPayment);
+    const selected = selectedPayment ? allPaymentMethods[selectedPayment] : null;
 
     return (
       <main className="animate-enter" style={{ maxWidth: '700px', margin: '0 auto', padding: '32px 24px 80px' }}>
@@ -608,46 +634,65 @@ export default function App() {
         {withdrawStep === 'select' ? (
           <>
             <p style={{ fontSize: '13px', color: '#5070a0', marginBottom: '20px', fontWeight: 500 }}>Select your preferred payment method to withdraw your earnings.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
-              {paymentMethods.map(method => (
-                <button
-                  key={method.id}
-                  onClick={() => setSelectedPayment(method.id)}
-                  style={{
-                    background: selectedPayment === method.id
-                      ? 'rgba(0,212,255,0.1)'
-                      : 'rgba(0,212,255,0.03)',
-                    border: selectedPayment === method.id
-                      ? '1px solid rgba(0,212,255,0.6)'
-                      : '1px solid rgba(0,212,255,0.15)',
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {displaySections.map(section => {
+                if (section.type === 'standalone') {
+                  return (
+                    <div key={section.methodId} style={{ display: 'grid', gridTemplateColumns: '1fr' }}>
+                      {renderMethodCard(section.methodId)}
+                    </div>
+                  );
+                }
+
+                const isOpen = expandedGroup === section.id;
+                const groupHasSelected = section.methodIds.includes(selectedPayment ?? '');
+
+                return (
+                  <div key={section.id} style={{
+                    border: groupHasSelected ? '1px solid rgba(0,212,255,0.5)' : '1px solid rgba(0,212,255,0.18)',
                     borderRadius: '12px',
-                    padding: '18px 20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    background: groupHasSelected ? 'rgba(0,212,255,0.04)' : 'transparent',
                     transition: 'all 0.2s',
-                    boxShadow: selectedPayment === method.id ? '0 0 16px rgba(0,212,255,0.2)' : 'none',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{
-                      width: '20px', height: '20px', borderRadius: '50%',
-                      border: selectedPayment === method.id ? '2px solid #00d4ff' : '2px solid rgba(0,212,255,0.3)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    }}>
-                      {selectedPayment === method.id && (
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00d4ff' }} />
-                      )}
-                    </div>
-                    <div style={{ textAlign: 'left' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#e0e8ff', fontFamily: 'Rajdhani, sans-serif' }}>{method.label}</div>
-                      <div style={{ fontSize: '11px', color: '#4a6080', fontWeight: 500 }}>({method.sub})</div>
-                    </div>
+                  }}>
+                    <button
+                      onClick={() => {
+                        setExpandedGroup(isOpen ? null : section.id);
+                        if (!isOpen && !groupHasSelected) setSelectedPayment(null);
+                      }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '16px 20px', background: 'transparent', border: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '20px' }}>{section.flag}</span>
+                        <div style={{ textAlign: 'left' }}>
+                          <div className="font-game" style={{ fontSize: '14px', fontWeight: 700, color: '#e0e8ff', letterSpacing: '0.05em' }}>{section.label}</div>
+                          <div style={{ fontSize: '11px', color: '#4a6080', fontWeight: 500 }}>
+                            {section.methodIds.map(id => allPaymentMethods[id].label).join(' · ')}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {section.methodIds.map(id => (
+                            <span key={id} style={{ opacity: 0.7 }}>{allPaymentMethods[id].logo}</span>
+                          ))}
+                        </div>
+                        <span style={{ color: '#00d4ff', fontSize: '18px', fontWeight: 300, marginLeft: '6px', transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>›</span>
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(0,212,255,0.1)' }}>
+                        <div style={{ height: '8px' }} />
+                        {section.methodIds.map(id => renderMethodCard(id, true))}
+                      </div>
+                    )}
                   </div>
-                  <div>{method.logo}</div>
-                </button>
-              ))}
+                );
+              })}
             </div>
 
             <button
@@ -687,6 +732,7 @@ export default function App() {
                 alert('Withdraw request submitted! We will process it within 24 hours.');
                 setWithdrawStep('select');
                 setSelectedPayment(null);
+                setExpandedGroup(null);
               }}
             >
               {selected?.fields.map(f => (
