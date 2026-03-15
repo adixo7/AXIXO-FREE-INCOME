@@ -585,9 +585,7 @@ export default function App() {
       label: 'UPI',
       sub: 'INR',
       logo: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ background: 'linear-gradient(135deg, #097939, #00b050)', borderRadius: '6px', padding: '3px 10px', fontWeight: 900, fontSize: '14px', color: '#fff', letterSpacing: '0.03em' }}>UPI</span>
-        </span>
+        <img src="/upi.avif" alt="UPI" style={{ height: '32px', objectFit: 'contain' }} />
       ),
       fields: [{ name: 'upi', label: 'UPI ID', type: 'text', placeholder: 'yourname@upi' }],
     },
