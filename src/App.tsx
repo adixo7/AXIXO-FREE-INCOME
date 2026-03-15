@@ -10,6 +10,11 @@ export default function App() {
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [withdrawStep, setWithdrawStep] = useState<'select' | 'form' | 'receipt'>('select');
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [missionStates, setMissionStates] = useState<Record<number, { startedAt: number; claimed: boolean }>>(() =>
+    JSON.parse(localStorage.getItem('adixo_mission_states') || '{}')
+  );
+  const [claimToast, setClaimToast] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
   const [withdrawReceipt, setWithdrawReceipt] = useState<{
     orderId: string;
     paymentMethod: string;
@@ -47,6 +52,18 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [withdrawStep]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (claimToast) {
+      const t = setTimeout(() => setClaimToast(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [claimToast]);
 
   const handleMenuClick = (view: ViewState) => {
     if (view === 'withdraw') {
@@ -311,13 +328,63 @@ export default function App() {
                   <CircleDollarSign size={18} color="#00ff87" />
                   {mission.reward.toFixed(2)}
                 </div>
-                <button
-                  onClick={() => { if (!currentUser) setCurrentView('login'); else alert('Mission started! Complete it in-game and return here to claim.'); }}
-                  className="btn-neon"
-                  style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
-                >
-                  START
-                </button>
+                {(() => {
+                  void tick;
+                  const ms = missionStates[mission.id];
+                  const now = Date.now();
+                  if (!ms) {
+                    return (
+                      <button
+                        onClick={() => {
+                          if (!currentUser) { setCurrentView('login'); return; }
+                          const updated = { ...missionStates, [mission.id]: { startedAt: Date.now(), claimed: false } };
+                          setMissionStates(updated);
+                          localStorage.setItem('adixo_mission_states', JSON.stringify(updated));
+                        }}
+                        className="btn-neon"
+                        style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
+                      >START</button>
+                    );
+                  }
+                  if (ms.claimed) {
+                    return (
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#00ff87', fontFamily: 'Orbitron, sans-serif', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>✓ CLAIMED</span>
+                    );
+                  }
+                  const elapsed = now - ms.startedAt;
+                  const remaining = 120000 - elapsed;
+                  if (remaining > 0) {
+                    const secs = Math.ceil(remaining / 1000);
+                    const m = Math.floor(secs / 60);
+                    const s = secs % 60;
+                    return (
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#ffaa00', fontFamily: 'Orbitron, sans-serif', whiteSpace: 'nowrap', letterSpacing: '0.04em' }}>
+                        {m}:{s.toString().padStart(2, '0')}
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      onClick={() => {
+                        const updated = { ...missionStates, [mission.id]: { ...ms, claimed: true } };
+                        setMissionStates(updated);
+                        localStorage.setItem('adixo_mission_states', JSON.stringify(updated));
+                        const users = JSON.parse(localStorage.getItem('adixo_users') || '{}');
+                        if (currentUser && users[currentUser.email]) {
+                          users[currentUser.email].balance = (users[currentUser.email].balance || 0) + mission.reward;
+                          users[currentUser.email].history = [
+                            { title: mission.title, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }), amount: `+$${mission.reward.toFixed(2)}` },
+                            ...(users[currentUser.email].history || []),
+                          ];
+                          localStorage.setItem('adixo_users', JSON.stringify(users));
+                        }
+                        setClaimToast(`$${mission.reward.toFixed(2)} credit received`);
+                      }}
+                      className="btn-neon btn-green"
+                      style={{ padding: '8px 18px', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
+                    >CLAIM</button>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -878,6 +945,22 @@ export default function App() {
         {renderHeader()}
         {renderView()}
       </div>
+      {claimToast && (
+        <div style={{
+          position: 'fixed', bottom: '32px', left: '50%', transform: 'translateX(-50%)',
+          background: 'linear-gradient(135deg, rgba(0,255,135,0.15), rgba(0,212,255,0.1))',
+          border: '1px solid rgba(0,255,135,0.5)', borderRadius: '12px',
+          padding: '14px 28px', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '10px',
+          boxShadow: '0 0 30px rgba(0,255,135,0.3), 0 8px 32px rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(10px)', whiteSpace: 'nowrap',
+          animation: 'fadeSlideUp 0.3s ease forwards',
+        }}>
+          <CircleDollarSign size={20} color="#00ff87" />
+          <span className="font-game neon-green" style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '0.06em' }}>
+            {claimToast}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
